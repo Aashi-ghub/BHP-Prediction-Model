@@ -1,38 +1,57 @@
-from flask import Flask, request, jsonify
-import util
+import json
+import pickle
+import sys
+import sklearn.linear_model
+import numpy as np
 
-app = Flask(__name__)
+__locations = None
+__data_columns = None
+__model = None
 
-@app.route('/')
-def home():
-    return "Welcome to Home Price Prediction API"
+def get_estimated_price(location, sqft, bhk, bath):
+    try:
+        loc_index = __data_columns.index(location.lower())
+    except:
+        loc_index = -1  # Location not found
 
-@app.route('/get_location_names', methods=['GET'])
+    x = np.zeros(len(__data_columns))
+    x[0] = sqft
+    x[1] = bath
+    x[2] = bhk
+
+    if loc_index >= 0:
+        x[loc_index] = 1
+    return round(__model.predict([x])[0], 2)
+
 def get_location_names():
-    response = jsonify({
-        'locations': util.get_location_names()
-    })
-    response.headers.add('Access-Control-Allow-Origin', '*')
+    global __locations
+    if __locations is None:
+        load_saved_artifacts()
+    return __locations or []
 
-    return response
+def load_saved_artifacts():
+    print("Loading server artifacts...start")
+    global __data_columns
+    global __locations
+    global __model
 
-@app.route('/predict_home_price', methods=['GET', 'POST'])
-def predict_home_price():
-    total_sqft = float(request.form['total_sqft'])
-    location = request.form['location']
-    bhk = int(request.form['bhk'])
-    bath = int(request.form['bath'])
+    with open("./artifacts/columns.json", 'r') as f:
+        __data_columns = [col.lower() for col in json.load(f)['data_columns']]
+        __locations = __data_columns[3:]
 
-    response = jsonify({
-        'estimated_price': util.get_estimated_price(location,total_sqft,bhk,bath)
-    })
-    response.headers.add('Access-Control-Allow-Origin', '*')
+    sys.modules['sklearn.linear_model.base'] = sklearn.linear_model
 
-    return response
+    if not hasattr(sklearn.linear_model.LinearRegression, 'positive'):
+        sklearn.linear_model.LinearRegression.positive = False
 
-if __name__ == "__main__":
-    import os
-    print("Starting Python Flask Server For Home Price Prediction...")
-    util.load_saved_artifacts()
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    with open("./artifacts/banglore_home_prices_model_pickle", 'rb') as f:
+        __model = pickle.load(f)
+    print("Loading server artifacts..done")
+
+if __name__ == '__main__':
+    load_saved_artifacts()
+    print(get_location_names())
+    print(get_estimated_price('1st phase jp nagar', 1000, 2, 2))
+    print(get_estimated_price('indira nagar', 1000, 2, 2))
+    print(get_estimated_price('indira nagar', 1000, 3, 3))
+    print(get_estimated_price('indira nagar', 1000, 4, 4))

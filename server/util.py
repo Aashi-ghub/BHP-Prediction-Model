@@ -1,55 +1,38 @@
-import json
-import pickle
-import sys
-import sklearn.linear_model  
-import numpy as np
+from flask import Flask, request, jsonify
+import util
 
-__locations = None
-__data_columns = None
-__model = None
+# Make sure artifacts are loaded even in production deployments
+util.load_saved_artifacts()
 
-def get_estimated_price(location, sqft, bhk, bath):
-    try:
-        loc_index = __data_columns.index(location.lower())
-    except:
-        loc_index = -1  # Location not found
+app = Flask(__name__)
 
-    x = np.zeros(len(__data_columns))
-    x[0] = sqft
-    x[1] = bath
-    x[2] = bhk
+@app.route('/')
+def home():
+    return "Welcome to Home Price Prediction API"
 
-    if loc_index >= 0:
-        x[loc_index] = 1
-    return round(__model.predict([x])[0], 2)
-
+@app.route('/get_location_names', methods=['GET'])
 def get_location_names():
-    return __locations
+    response = jsonify({
+        'locations': util.get_location_names()
+    })
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
-def load_saved_artifacts():
-    print("Loading server artifacts...start")
-    global __data_columns
-    global __locations
-    global __model
+@app.route('/predict_home_price', methods=['GET', 'POST'])
+def predict_home_price():
+    total_sqft = float(request.form['total_sqft'])
+    location = request.form['location']
+    bhk = int(request.form['bhk'])
+    bath = int(request.form['bath'])
 
-    with open("./artifacts/columns.json", 'r') as f:
-        __data_columns = [col.lower() for col in json.load(f)['data_columns']]
-        __locations = __data_columns[3:]
+    response = jsonify({
+        'estimated_price': util.get_estimated_price(location, total_sqft, bhk, bath)
+    })
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
-    sys.modules['sklearn.linear_model.base'] = sklearn.linear_model
-
-    # Patch LinearRegression to add missing attribute 'positive'
-    if not hasattr(sklearn.linear_model.LinearRegression, 'positive'):
-        sklearn.linear_model.LinearRegression.positive = False
-
-    with open("./artifacts/banglore_home_prices_model_pickle", 'rb') as f:
-        __model = pickle.load(f)
-    print("Loading server artifacts..done")
-
-if __name__ == '__main__':
-    load_saved_artifacts()
-    print(get_location_names())
-    print(get_estimated_price('1st phase jp nagar', 1000, 2, 2))
-    print(get_estimated_price('indira nagar', 1000, 2, 2))
-    print(get_estimated_price('indira nagar', 1000, 3, 3))
-    print(get_estimated_price('indira nagar', 1000, 4, 4))
+if __name__ == "__main__":
+    import os
+    print("Starting Python Flask Server For Home Price Prediction...")
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
