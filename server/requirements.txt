@@ -1,4 +1,4 @@
-flask
-numpy
+numpy==1.16.6
 scikit-learn==0.22
+flask
 gunicorn
