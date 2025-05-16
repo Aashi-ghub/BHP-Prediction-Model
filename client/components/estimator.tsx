@@ -24,7 +24,7 @@ export function Estimator() {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:5000/get_location_names")
+        const response = await fetch("https://bhp-prediction-model-1.onrender.com/get_location_names")
         const data = await response.json()
         setLocations(data.locations)
         setLoadingLocations(false)
@@ -61,7 +61,7 @@ export function Estimator() {
       formData.append('bhk', bhk.toString())
       formData.append('bath', bath.toString())
 
-      const response = await fetch("http://127.0.0.1:5000/predict_home_price", {
+      const response = await fetch("https://bhp-prediction-model-1.onrender.com/predict_home_price", {
         method: "POST",
         body: formData,
       })
