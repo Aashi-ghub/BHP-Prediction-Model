@@ -145,9 +145,3 @@ BHP-Prediction-Model/
 
 For questions, suggestions, or collaboration, reach out at:
 **Aashi** – [GitHub](https://github.com/Aashi-ghub) | [aashi.email@example.com](mailto:aashi.email@example.com)
-
----
-
----
-
-If you want, I can help you customize this further, add screenshots or deployment instructions, or make a project report doc based on this. What do you think?
