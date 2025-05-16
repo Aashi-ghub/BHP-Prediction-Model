@@ -3,6 +3,10 @@ import util
 
 app = Flask(__name__)
 
+@app.route('/')
+def home():
+    return "Welcome to Home Price Prediction API"
+
 @app.route('/get_location_names', methods=['GET'])
 def get_location_names():
     response = jsonify({
