@@ -7,7 +7,7 @@
 Built with production readiness in mind, this project secured a position in the top 1% of submissions during the internship, demonstrating strong skills in data science, model building, backend API development, and frontend integration.
 
 ---
-![App Screenshot](screenshot.jpeg)
+![App Screenshot](screenshot.jpg)
 
 ## Features
 
