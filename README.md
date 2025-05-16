@@ -4,7 +4,7 @@
 
 **Bangalore Home Price Estimator** is an AI-powered web application that delivers accurate property price predictions across various localities in Bangalore. Developed as part of an internal internship project, this tool leverages advanced machine learning algorithms to analyze thousands of real estate listings and provide reliable price estimates based on user inputs such as area, number of bedrooms, bathrooms, and location.
 
-Built with production readiness in mind, this project secured a position in the top 1% of submissions during the internship, demonstrating strong skills in data science, model building, backend API development, and frontend integration.
+Built with production readiness in mind, demonstrating strong skills in data science, model building, backend API development, and frontend integration.
 
 ---
 ![App Screenshot](screenshot.jpg)
@@ -33,17 +33,21 @@ Built with production readiness in mind, this project secured a position in the 
 ## Project Structure
 
 ```
-Bangalore-Home-Price-Estimator/
-├── artifacts/
-│   ├── banglore_home_prices_model_pickle  # Serialized ML model
-│   └── columns.json                        # Feature columns used in training
-├── server.py                              # Flask API server
-├── util.py                                # Utility functions for loading artifacts & prediction logic
-├── frontend/                              # React frontend application
+BHP-Prediction-Model/
+├── model/
+│   ├── banglore_home_price_model_pickle    # Serialized ML model
+│   ├── columns.json                        # Feature columns used in training
+│   └── datascience.ipynb                   # Jupyter notebook for data analysis and model training
+├── server/
+│   ├── artifacts/                          # Folder for saved artifacts (model, json, etc.)
+│   ├── server.py                          # Flask API server
+│   ├── util.py                            # Utility functions for loading artifacts & prediction logic
+│   └── requirements.txt                   # Python dependencies for backend
+├── client/                                # React frontend application
 │   ├── src/
 │   └── public/
-├── README.md
-└── requirements.txt
+├── .venv/                                # Python virtual environment (optional)
+└── README.md
 ```
 
 ---
